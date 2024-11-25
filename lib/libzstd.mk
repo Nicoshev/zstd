@@ -157,6 +157,8 @@ ZSTD_DECOMPRESS_AMD64_ASM_FILES := $(sort $(wildcard $(LIB_SRCDIR)/decompress/*_
 
 ZSTD_DECOMPRESS_ARM64_ASM_FILES := $(sort $(wildcard $(LIB_SRCDIR)/decompress/*_arm64.S))
 
+CFLAGS += -DHUF_FORCE_DECOMPRESS_X2
+
 ifneq ($(ZSTD_NO_ASM), 0)
   CPPFLAGS += -DZSTD_DISABLE_ASM
 else
@@ -168,7 +170,7 @@ else
 endif
 
 ifneq ($(HUF_FORCE_DECOMPRESS_X1), 0)
-  CFLAGS += -DHUF_FORCE_DECOMPRESS_X1
+  #CFLAGS += -DHUF_FORCE_DECOMPRESS_X1
 endif
 
 ifneq ($(HUF_FORCE_DECOMPRESS_X2), 0)

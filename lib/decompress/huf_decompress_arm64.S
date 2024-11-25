@@ -141,7 +141,7 @@ HUF_decompress4X1_usingDTable_internal_fast_arm64_loop:
     csel    x15, x22, x15, ls
 
     cmp x15, #0
-    blo .L_4X1_exit
+    beq .L_4X1_exit
 
     /* If (ip1 < ip0) go to exit */
     cmp ip0, ip1
