@@ -128,8 +128,14 @@
 /* Target attribute for BMI2 dynamic dispatch.
  * Enable lzcnt, bmi, and bmi2.
  * We test for bmi1 & bmi2. lzcnt is included in bmi1.
+ * ARMv8+ supports decoding huffman using assembly code
+ * without requiring any further instruction set
  */
+#if defined(__aarch64__)
+#define BMI2_TARGET_ATTRIBUTE 
+#else
 #define BMI2_TARGET_ATTRIBUTE TARGET_ATTRIBUTE("lzcnt,bmi,bmi2")
+#endif
 
 /* prefetch
  * can be disabled, by declaring NO_PREFETCH build macro */

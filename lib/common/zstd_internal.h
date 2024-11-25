@@ -381,8 +381,12 @@ size_t ZSTD_decodeSeqHeaders(ZSTD_DCtx* dctx, int* nbSeqPtr,
  */
 MEM_STATIC int ZSTD_cpuSupportsBmi2(void)
 {
+#ifdef __aarch64__
+    return 1;
+#else
     ZSTD_cpuid_t cpuid = ZSTD_cpuid();
     return ZSTD_cpuid_bmi1(cpuid) && ZSTD_cpuid_bmi2(cpuid);
+#endif
 }
 
 #if defined (__cplusplus)

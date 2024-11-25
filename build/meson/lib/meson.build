@@ -51,6 +51,7 @@ libzstd_sources = [join_paths(zstd_rootdir, 'lib/common/entropy_common.c'),
 # Otherwise, explicitly disable assembly.
 if [compiler_gcc, compiler_clang].contains(cc_id)
   libzstd_sources += join_paths(zstd_rootdir, 'lib/decompress/huf_decompress_amd64.S')
+  libzstd_sources += join_paths(zstd_rootdir, 'lib/decompress/huf_decompress_arm64.S')
 else
   add_project_arguments('-DZSTD_DISABLE_ASM', language: 'c')
 endif

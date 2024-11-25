@@ -81,7 +81,7 @@
   #if ((defined(__clang__) && __has_attribute(__target__)) \
       || (defined(__GNUC__) \
           && (__GNUC__ >= 5 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)))) \
-      && (defined(__x86_64__) || defined(_M_X64)) \
+      && (defined(__x86_64__) || defined(_M_X64) || defined(__aarch64__)) \
       && !defined(__BMI2__)
   #  define DYNAMIC_BMI2 1
   #else
@@ -131,9 +131,19 @@
     ZSTD_ASM_SUPPORTED &&                                         \
     defined(__x86_64__) &&                                        \
     (DYNAMIC_BMI2 || defined(__BMI2__))
+#if defined(__x86_64__) 
 # define ZSTD_ENABLE_ASM_X86_64_BMI2 1
+# define ZSTD_ENABLE_ASM_ARM64_BMI2 0
+#elif defined(__aarch64__) 
+# define ZSTD_ENABLE_ASM_X86_64_BMI2 0
+# define ZSTD_ENABLE_ASM_ARM64_BMI2 1
 #else
 # define ZSTD_ENABLE_ASM_X86_64_BMI2 0
+# define ZSTD_ENABLE_ASM_ARM64_BMI2 0
+#endif
+#else
+# define ZSTD_ENABLE_ASM_X86_64_BMI2 0
+# define ZSTD_ENABLE_ASM_ARM64_BMI2 0
 #endif
 
 /*

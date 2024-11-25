@@ -28,8 +28,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *src, size_t size)
     /* Select random parameters: #streams, X1 or X2 decoding, bmi2 */
     int const streams = FUZZ_dataProducer_int32Range(producer, 0, 1);
     int const symbols = FUZZ_dataProducer_int32Range(producer, 0, 1);
+        bool cpuSupportsBmi;
+#ifdef __aarch64__
+    cpuSupportsBmi = true;
+#else
+    cpuSupportsBmi = ZSTD_cpuid_bmi2(ZSTD_cpuid());
+#endif
     int const flags = 0
-        | (ZSTD_cpuid_bmi2(ZSTD_cpuid()) && FUZZ_dataProducer_int32Range(producer, 0, 1) ? HUF_flags_bmi2 : 0)
+        | (cpuSupportsBmi && FUZZ_dataProducer_int32Range(producer, 0, 1) ? HUF_flags_bmi2 : 0)
         | (FUZZ_dataProducer_int32Range(producer, 0, 1) ? HUF_flags_optimalDepth : 0)
         | (FUZZ_dataProducer_int32Range(producer, 0, 1) ? HUF_flags_preferRepeat : 0)
         | (FUZZ_dataProducer_int32Range(producer, 0, 1) ? HUF_flags_suspectUncompressible : 0)

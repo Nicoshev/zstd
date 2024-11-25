@@ -143,7 +143,11 @@ ZSTD_CCtx* ZSTD_initStaticCCtx(void* workspace, size_t workspaceSize)
     cctx->blockState.nextCBlock = (ZSTD_compressedBlockState_t*)ZSTD_cwksp_reserve_object(&cctx->workspace, sizeof(ZSTD_compressedBlockState_t));
     cctx->tmpWorkspace = ZSTD_cwksp_reserve_object(&cctx->workspace, TMP_WORKSPACE_SIZE);
     cctx->tmpWkspSize = TMP_WORKSPACE_SIZE;
+#ifdef __aarch64__
+    cctx->bmi2 = 1;
+#else
     cctx->bmi2 = ZSTD_cpuid_bmi2(ZSTD_cpuid());
+#endif
     return cctx;
 }
 
