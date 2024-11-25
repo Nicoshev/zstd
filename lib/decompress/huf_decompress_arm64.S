@@ -17,7 +17,7 @@
 .section .note.GNU-stack,"",%progbits
 #endif
 
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
+#if ZSTD_ENABLE_ASM_ARM64
 
 /* Calling convention:
  *

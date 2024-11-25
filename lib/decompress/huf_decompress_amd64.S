@@ -119,7 +119,7 @@ ZSTD_HIDE_ASM_FUNCTION(_HUF_decompress4X1_usingDTable_internal_fast_asm_loop)
 _HUF_decompress4X1_usingDTable_internal_fast_asm_loop:
 HUF_decompress4X1_usingDTable_internal_fast_asm_loop:
     ZSTD_CET_ENDBRANCH
-    /* Save all registers - even if they are caller saved for simplicity. */
+    /* Save all registers - even if they are callee saved for simplicity. */
     push %rax
     push %rbx
     push %rcx
@@ -374,7 +374,7 @@ HUF_decompress4X1_usingDTable_internal_fast_asm_loop:
 _HUF_decompress4X2_usingDTable_internal_fast_asm_loop:
 HUF_decompress4X2_usingDTable_internal_fast_asm_loop:
     ZSTD_CET_ENDBRANCH
-    /* Save all registers - even if they are caller saved for simplicity. */
+    /* Save all registers - even if they are callee saved for simplicity. */
     push %rax
     push %rbx
     push %rcx

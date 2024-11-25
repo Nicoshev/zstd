@@ -711,7 +711,7 @@ size_t HUF_decompress4X1_usingDTable_internal_default(void* dst, size_t dstSize,
     return HUF_decompress4X1_usingDTable_internal_body(dst, dstSize, cSrc, cSrcSize, DTable);
 }
 
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
+#if ZSTD_ENABLE_ASM_ARM64
 
 HUF_ASM_DECL void HUF_decompress4X1_usingDTable_internal_fast_arm64_loop(HUF_DecompressFastArgs* args) ZSTDLIB_HIDDEN;
 
@@ -908,7 +908,7 @@ static size_t HUF_decompress4X1_usingDTable_internal(void* dst, size_t dstSize, 
     if (flags & HUF_flags_bmi2) {
         fallbackFn = HUF_decompress4X1_usingDTable_internal_bmi2;
         if (!(flags & HUF_flags_disableAsm)) {
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
+#if ZSTD_ENABLE_ASM_ARM64
             loopFn = HUF_decompress4X1_usingDTable_internal_fast_arm64_loop;
 #elif ZSTD_ENABLE_ASM_X86_64_BMI2
             loopFn = HUF_decompress4X1_usingDTable_internal_fast_asm_loop;
@@ -919,15 +919,13 @@ static size_t HUF_decompress4X1_usingDTable_internal(void* dst, size_t dstSize, 
     }
 #endif
 
-#if defined(__BMI2__)
-        if (!(flags & HUF_flags_disableAsm)) {
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
-            loopFn = HUF_decompress4X1_usingDTable_internal_fast_arm64_loop;
-#elif ZSTD_ENABLE_ASM_X86_64_BMI2
-            loopFn = HUF_decompress4X1_usingDTable_internal_fast_asm_loop;
-# endif
-        }
+    if (!(flags & HUF_flags_disableAsm)) {
+#if ZSTD_ENABLE_ASM_X86_64_BMI2 && defined(__BMI2__)
+        loopFn = HUF_decompress4X1_usingDTable_internal_fast_asm_loop;
+#elif ZSTD_ENABLE_ASM_ARM64
+        loopFn = HUF_decompress4X1_usingDTable_internal_fast_arm64_loop
 #endif
+    }
 
     if (HUF_ENABLE_FAST_DECODE && !(flags & HUF_flags_disableFast)) {
         size_t const ret = HUF_decompress4X1_usingDTable_internal_fast(dst, dstSize, cSrc, cSrcSize, DTable, loopFn);
@@ -1524,7 +1522,7 @@ size_t HUF_decompress4X2_usingDTable_internal_default(void* dst, size_t dstSize,
     return HUF_decompress4X2_usingDTable_internal_body(dst, dstSize, cSrc, cSrcSize, DTable);
 }
 
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
+#if ZSTD_ENABLE_ASM_ARM64
 
 HUF_ASM_DECL void HUF_decompress4X2_usingDTable_internal_fast_arm64_loop(HUF_DecompressFastArgs* args) ZSTDLIB_HIDDEN;
 
@@ -1741,7 +1739,7 @@ static size_t HUF_decompress4X2_usingDTable_internal(void* dst, size_t dstSize, 
         fallbackFn = HUF_decompress4X2_usingDTable_internal_bmi2;
 
         if (!(flags & HUF_flags_disableAsm)) {
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
+#if ZSTD_ENABLE_ASM_ARM64
             loopFn = HUF_decompress4X2_usingDTable_internal_fast_arm64_loop;
 #elif ZSTD_ENABLE_ASM_X86_64_BMI2
             loopFn = HUF_decompress4X2_usingDTable_internal_fast_asm_loop;
@@ -1752,15 +1750,13 @@ static size_t HUF_decompress4X2_usingDTable_internal(void* dst, size_t dstSize, 
     }
 #endif
 
-#if defined(__BMI2__)
     if (!(flags & HUF_flags_disableAsm)) {
-#if ZSTD_ENABLE_ASM_ARM64_BMI2
-            loopFn = HUF_decompress4X2_usingDTable_internal_fast_arm64_loop;
-#elif ZSTD_ENABLE_ASM_X86_64_BMI2
-            loopFn = HUF_decompress4X2_usingDTable_internal_fast_asm_loop;
+#if ZSTD_ENABLE_ASM_X86_64_BMI2 && defined(__BMI2__)
+        loopFn = HUF_decompress4X2_usingDTable_internal_fast_asm_loop;
+#elif ZSTD_ENABLE_ASM_ARM64
+        loopFn = HUF_decompress4X2_usingDTable_internal_fast_arm64_loop
 #endif
     }
-#endif
 
     if (HUF_ENABLE_FAST_DECODE && !(flags & HUF_flags_disableFast)) {
         size_t const ret = HUF_decompress4X2_usingDTable_internal_fast(dst, dstSize, cSrc, cSrcSize, DTable, loopFn);

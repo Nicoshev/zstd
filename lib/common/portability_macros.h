@@ -128,21 +128,26 @@
  *   - BMI2 is supported at compile time
  */
 #if !defined(ZSTD_DISABLE_ASM) &&                                 \
-    ZSTD_ASM_SUPPORTED &&                                         \
-    (DYNAMIC_BMI2 || defined(__BMI2__))
-#if defined(__x86_64__) 
-# define ZSTD_ENABLE_ASM_X86_64_BMI2 1
-# define ZSTD_ENABLE_ASM_ARM64_BMI2 0
-#elif defined(__aarch64__) 
-# define ZSTD_ENABLE_ASM_X86_64_BMI2 0
-# define ZSTD_ENABLE_ASM_ARM64_BMI2 1
+        ZSTD_ASM_SUPPORTED
+
+# if defined(__x86_64__) && (DYNAMIC_BMI2 || defined(__BMI2__))
+#  define ZSTD_ENABLE_ASM_X86_64_BMI2 1
+# else
+#  define ZSTD_ENABLE_ASM_X86_64_BMI2 0
+# endif
+
+/* For now only enable ARM64 assembly when ZSTD_EXPERIMENTAL_ARM64
++ * is defined. This ensures that it is only enabled for your tests.
++ */
+# if defined(__aarch64__) && defined(ZSTD_EXPERIMENTAL_ARM64) && !defined(__APPLE__)
+#  define ZSTD_ENABLE_ASM_ARM64 1
+# else
+#  define ZSTD_ENABLE_ASM_ARM64 0
+# endif
+
 #else
 # define ZSTD_ENABLE_ASM_X86_64_BMI2 0
-# define ZSTD_ENABLE_ASM_ARM64_BMI2 0
-#endif
-#else
-# define ZSTD_ENABLE_ASM_X86_64_BMI2 0
-# define ZSTD_ENABLE_ASM_ARM64_BMI2 0
+# define ZSTD_ENABLE_ASM_ARM64 0
 #endif
 
 /*
