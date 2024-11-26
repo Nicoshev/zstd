@@ -28,9 +28,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *src, size_t size)
     /* Select random parameters: #streams, X1 or X2 decoding, bmi2 */
     int const streams = FUZZ_dataProducer_int32Range(producer, 0, 1);
     int const symbols = FUZZ_dataProducer_int32Range(producer, 0, 1);
-        bool cpuSupportsBmi;
+        int cpuSupportsBmi;
 #ifdef __aarch64__
-    cpuSupportsBmi = true;
+    cpuSupportsBmi = 1;
 #else
     cpuSupportsBmi = ZSTD_cpuid_bmi2(ZSTD_cpuid());
 #endif
