@@ -19,6 +19,11 @@
 
 #if ZSTD_ENABLE_ASM_ARM64
 
+#if !(__APPLE__)
+/* on Apple platforms ' %%' is used as seperator instead of ';' */
+    #define %% ;
+#endif
+
 /* Calling convention:
  *
  * x0 contains the first argument: HUF_DecompressAsmArgs*.
@@ -75,16 +80,16 @@ ZSTD_HIDE_ASM_FUNCTION(_HUF_decompress4X1_usingDTable_internal_fast_arm64_loop)
 
 /* Calls X(N) for each stream 0, 1, 2, 3. */
 #define FOR_EACH_STREAM(X) \
-    X(0);                  \
-    X(1);                  \
-    X(2);                  \
+    X(0) %%                 \
+    X(1) %%                 \
+    X(2) %%                 \
     X(3)
 
 /* Calls X(N, idx) for each stream 0, 1, 2, 3. */
 #define FOR_EACH_STREAM_WITH_INDEX(X, idx) \
-    X(0, idx);                             \
-    X(1, idx);                             \
-    X(2, idx);                             \
+    X(0, idx) %%                            \
+    X(1, idx) %%                            \
+    X(2, idx) %%                            \
     X(3, idx)
 
 /* Define both _HUF_* & HUF_* symbols because MacOS
@@ -164,30 +169,28 @@ HUF_decompress4X1_usingDTable_internal_fast_arm64_loop:
 /* Reads top 11 bits from bits[n]
  * Loads dt[bits[n]] into var[n]
  */
-#define GET_NEXT_DELT(n)                    \
-    lsr var##n, bits##n, #53;               \
-    ldrh vard##n, [dtable, var##n, lsl #1];
+#define GET_NEXT_DELT(n)                        \
+    lsr var##n, bits##n, #53 %%                  \
+    ldrh vard##n, [dtable, var##n, lsl #1] %%
 
 /* var[n] must contain the DTable entry computed with GET_NEXT_DELT
- * Moves var[n] to %rax
+ * Moves var[n] to x21
  * bits[n] <<= var[n] & 63
- * op[n][idx] = %rax >> 8
- * %ah is a way to access bits [8, 16) of %rax
+ * op[n][idx] = x21 >> 8
  */
-#define DECODE_FROM_DELT(n, idx)       \
-    lsr x21, var##n, #8;               \
-    lsl bits##n, bits##n, var##n;      \
-    strb w21, [op##n, ##idx];
+#define DECODE_FROM_DELT(n, idx)        \
+    lsr x21, var##n, #8 %%               \
+    lsl bits##n, bits##n, var##n %%      \
+    strb w21, [op##n, ##idx] %%
 
 /* Assumes GET_NEXT_DELT has been called.
  * Calls DECODE_FROM_DELT then GET_NEXT_DELT
  */
 #define DECODE_AND_GET_NEXT(n, idx) \
-    DECODE_FROM_DELT(n, idx);       \
+    DECODE_FROM_DELT(n, idx) %%      \
     GET_NEXT_DELT(n)                \
 
 /* // ctz & nbBytes is stored in bits[n]
- * // nbBits is stored in %rax
  * ctz  = CTZ[bits[n]]
  * nbBits  = ctz & 7
  * nbBytes = ctz >> 3
@@ -198,14 +201,14 @@ HUF_decompress4X1_usingDTable_internal_fast_arm64_loop:
  * bits[n] <<= nbBits
  */
 #define RELOAD_BITS(n)                  \
-    rbit bits##n, bits##n;              \
-    clz bits##n, bits##n;               \
-    sub ip##n, ip##n, bits##n, lsr #3;  \
-    and x22, bits##n, #7;               \
-    add op##n, op##n, #5;               \
-    ldr bits##n, [ip##n];               \
-    orr bits##n, bits##n, #1;           \
-    lsl bits##n, bits##n, x22;
+    rbit bits##n, bits##n %%             \
+    clz bits##n, bits##n %%              \
+    sub ip##n, ip##n, bits##n, lsr #3 %% \
+    and x22, bits##n, #7 %%              \
+    add op##n, op##n, #5 %%              \
+    ldr bits##n, [ip##n] %%              \
+    orr bits##n, bits##n, #1 %%          \
+    lsl bits##n, bits##n, x22 %%
 
     /* Call GET_NEXT_DELT for each stream */
     FOR_EACH_STREAM(GET_NEXT_DELT)
@@ -350,23 +353,23 @@ HUF_decompress4X2_usingDTable_internal_fast_arm64_loop:
     add x1, x20, x20, lsl #2
     add olimit, op3, x1
 
-#define DECODE(n, idx)              \
-    lsr x21, bits##n, #53;          \
-    ldr w21, [dtable, x21, lsl #2]; \
-    strh w21, [op##n];              \
-    lsr w20, w21, #16;              \
-    add op##n, op##n, x21, lsr #24; \
-    and x20, x20, #255;             \
-    lsl bits##n, bits##n, x20;
+#define DECODE(n, idx)               \
+    lsr x21, bits##n, #53 %%          \
+    ldr w21, [dtable, x21, lsl #2] %% \
+    strh w21, [op##n] %%              \
+    lsr w20, w21, #16 %%              \
+    add op##n, op##n, x21, lsr #24 %% \
+    and x20, x20, #255 %%             \
+    lsl bits##n, bits##n, x20 %%
 
 #define RELOAD_BITS(n)                  \
-    rbit bits##n, bits##n;              \
-    clz bits##n, bits##n;               \
-    sub ip##n, ip##n, bits##n, lsr #3;  \
-    and x1, bits##n, #7;                \
-    ldr bits##n, [ip##n];               \
-    orr bits##n, bits##n, #1;           \
-    lsl bits##n, bits##n, x1;
+    rbit bits##n, bits##n %%              \
+    clz bits##n, bits##n %%               \
+    sub ip##n, ip##n, bits##n, lsr #3 %%  \
+    and x1, bits##n, #7 %%                \
+    ldr bits##n, [ip##n] %%               \
+    orr bits##n, bits##n, #1 %%           \
+    lsl bits##n, bits##n, x1 %%
 
     .p2align 6
 

@@ -139,7 +139,7 @@
 /* For now only enable ARM64 assembly when ZSTD_EXPERIMENTAL_ARM64
 + * is defined. This ensures that it is only enabled for your tests.
 + */
-# if defined(__aarch64__) && defined(ZSTD_EXPERIMENTAL_ARM64) && !defined(__APPLE__)
+# if defined(__aarch64__)
 #  define ZSTD_ENABLE_ASM_ARM64 1
 # else
 #  define ZSTD_ENABLE_ASM_ARM64 0
