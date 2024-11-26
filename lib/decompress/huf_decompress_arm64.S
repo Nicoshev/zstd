@@ -19,11 +19,11 @@
 
 #if ZSTD_ENABLE_ASM_ARM64
 
-#if !(__APPLE__)
+#if defined(__APPLE__) && (__APPLE__)
 /* on Apple platforms ' %%' is used as seperator instead of ';' */
-    #define __ENDL__ ;
-#else
     #define __ENDL__ %%
+#else
+    #define __ENDL__ ;
 #endif
 
 /* Calling convention:
